@@ -46,6 +46,9 @@ class MyApp extends StatelessWidget {
 
       ],
       child: MaterialApp(
+          useInheritedMediaQuery: true, // penting untuk DevicePreview
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
         title: 'Novel App',
         navigatorKey: navigatorKey,
          routes: {
