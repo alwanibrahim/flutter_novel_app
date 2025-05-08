@@ -9,12 +9,19 @@ import 'screens/saved_screen.dart';
 import 'screens/profile_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:device_preview/device_preview.dart';
 
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  runApp(
+     DevicePreview(
+      enabled:
+          !bool.fromEnvironment('dart.vm.product'), // hanya aktif di debug mode
+      builder: (context) => const MyApp(), // aplikasi kamu
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
