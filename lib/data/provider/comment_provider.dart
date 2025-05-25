@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_novel_app/data/api/comment_service.dart';
 import 'package:flutter_novel_app/data/model/comment_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class CommentProvider with ChangeNotifier {
@@ -8,9 +9,12 @@ class CommentProvider with ChangeNotifier {
 
   bool isLoading = false;
   List<CommentModel> _comments = [];
+   CommentModel? _detail;
 
   List<CommentModel> get comments => _comments;
+  CommentModel? get detail => _detail;
 
+  
   Future<void> loadComments(int reviewId) async {
     isLoading = true;
     notifyListeners();
@@ -38,4 +42,20 @@ class CommentProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<int?> getCurrentUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('user_id');
+}
+
+
+   Future<void> deleteComment(int commentId, int reviewId) async {
+    await _service.deleteComment(reviewId,commentId);
+    await loadComments(reviewId);
+  }
+  Future<void> likeComment(int reviewId, int commentId) async {
+    await _service.likeComment(reviewId, commentId);
+    await loadComments(reviewId);
+  }
+
 }

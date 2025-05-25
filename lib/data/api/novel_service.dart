@@ -5,6 +5,7 @@ import 'package:flutter_novel_app/data/model/reading_model.dart';
 import 'package:flutter_novel_app/data/model/saved_model.dart';
 import 'package:hive/hive.dart';
 
+
 class NovelService {
   final Dio _dio = DioClient.dio;
 
@@ -34,6 +35,12 @@ class NovelService {
       throw Exception('Gagal ambil data: $e');
     }
   }
+
+  Future<List<NovelModel>> getFeaturedNovels() async {
+    final response = await _dio.get('/novels/featured');
+    return (response.data['data'] as List).map((e) => NovelModel.fromJson(e)).toList();
+  }
+
 
   Future<NovelModel> fetchNovelById(int id) async {
     try {
@@ -155,4 +162,25 @@ class NovelService {
       throw Exception('Failed to fetch reading history: $e');
     }
   }
+
+   Future<void> deleteReadingHistory(int id) async {
+    try {
+      await _dio.delete('/reading-history/$id');
+    } catch (e) {
+      throw Exception('Gagal menghapus riwayat: $e');
+    }
+  }
+
+  Future<void> deleteAllReadingHistory() async {
+    try {
+
+      await _dio.delete(
+        '/reading-history',
+
+      );
+    } catch (e) {
+      throw Exception('Gagal menghapus semua riwayat: $e');
+    }
+  }
+
 }

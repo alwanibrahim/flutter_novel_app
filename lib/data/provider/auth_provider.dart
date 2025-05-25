@@ -90,7 +90,7 @@ class AuthProvider extends ChangeNotifier {
 
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/register', // Ganti dengan route login atau register kamu
+      '/main', // Ganti dengan route login atau register kamu
       (route) => false,
     );
 

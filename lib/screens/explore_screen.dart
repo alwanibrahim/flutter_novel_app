@@ -14,7 +14,7 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   TabController? _tabController;
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
@@ -83,6 +83,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   void _handleSearchChange() {
     final query = _searchController.text.trim();
     final novelProvider = Provider.of<NovelProvider>(context, listen: false);
+    novelProvider.getNovel();
 
     setState(() {
       _isSearching = query.isNotEmpty;
@@ -115,6 +116,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   Widget build(BuildContext context) {
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final novelProvider = Provider.of<NovelProvider>(context);
+    novelProvider.getNovel();
 
     // Show loading indicator while categories are being fetched
     if (categoryProvider.isLoading || !_isInitialized) {
@@ -193,7 +195,8 @@ class _ExploreScreenState extends State<ExploreScreen>
                 labelColor: Theme.of(context).primaryColor,
                 unselectedLabelColor: Colors.grey,
                 indicatorColor: Theme.of(context).primaryColor,
-                labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                labelStyle:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 unselectedLabelStyle: const TextStyle(fontSize: 12),
                 indicatorWeight: 2,
                 tabs: tabs,
@@ -225,7 +228,8 @@ class _ExploreScreenState extends State<ExploreScreen>
             children: [
               // Shimmer Search Bar
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -247,17 +251,16 @@ class _ExploreScreenState extends State<ExploreScreen>
                   highlightColor: Colors.grey[100]!,
                   child: Row(
                     children: List.generate(
-                      4,
-                      (index) => Container(
-                        width: 60,
-                        height: 30,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      )
-                    ),
+                        4,
+                        (index) => Container(
+                              width: 60,
+                              height: 30,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            )),
                   ),
                 ),
               ),

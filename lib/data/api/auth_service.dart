@@ -26,9 +26,11 @@ class ApiAuth {
         if (loginResponse.token.isNotEmpty) {
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', loginResponse.token);
-          await prefs.setString('email', email); // simpan email
+          await prefs.setString('email', email);
+          await prefs.setInt('user_id', loginResponse.userId); // Tambahkan ini
 
-          print("Token disimpan: ${loginResponse.token}");
+          print(
+              "Token dan user_id disimpan: ${loginResponse.token}, ${loginResponse.userId}");
 
           if (!loginResponse.isVerified) {
             // Kirim OTP

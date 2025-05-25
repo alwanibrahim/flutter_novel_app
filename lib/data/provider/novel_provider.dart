@@ -8,6 +8,9 @@ class NovelProvider with ChangeNotifier {
   List<NovelModel> _dataList = [];
   List<NovelModel> get dataList => _dataList;
 
+  List<NovelModel> _dataListfeatured = [];
+  List<NovelModel> get dataListfeature => _dataListfeatured;
+
   NovelModel? _novelDetail;
   NovelModel? get novelDetail => _novelDetail;
 
@@ -27,6 +30,13 @@ class NovelProvider with ChangeNotifier {
 
   List<int> get favoriteNovelIds => _favoriteNovelIds;
 
+   List<NovelModel> get latestNovels {
+    List<NovelModel> sorted = [..._dataList];
+    sorted
+        .sort((a, b) => b.createdAt.compareTo(a.createdAt)); // terbaru di atas
+    return sorted;
+  }
+
   Future<void> getNovel() async {
     if (_isFetched) return;
     _isFetched = true;
@@ -35,6 +45,22 @@ class NovelProvider with ChangeNotifier {
 
     try {
       _dataList = await _apiService.fetchData();
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+  Future<void> getNovelFeatured() async {
+    if (_isFetched) return;
+    _isFetched = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _dataList = await _apiService.getFeaturedNovels();
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -66,21 +92,21 @@ class NovelProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+  //* ini adalah fitur search
+    void searchNovels(String query) {
+    final lowerQuery = query.toLowerCase();
 
-  Future<void> searchNovels(String query) async {
-    if (query.isEmpty) {
-      _searchResults = [];
-      notifyListeners();
-      return;
-    }
+    _searchResults = _dataList.where((novel) {
+      final titleMatch = novel.title.toLowerCase().contains(lowerQuery);
+      final authorMatch = novel.author.name.toLowerCase().contains(lowerQuery);
+      final categoryMatch = novel.category.name.toLowerCase().contains(lowerQuery);
 
-    try {
-      _searchResults = await _apiService.searchNovels(query);
-      notifyListeners();
-    } catch (e) {
-      print('Error searching novels: $e');
-    }
+      return titleMatch || authorMatch || categoryMatch;
+    }).toList();
+
+    notifyListeners();
   }
+
 
    Future<void> toggleFavorite({
     required int novelId,
@@ -107,7 +133,7 @@ class NovelProvider with ChangeNotifier {
   }
 
 
-  
+
 
 
   // providers/novel_provider.dart

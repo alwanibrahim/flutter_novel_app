@@ -23,4 +23,28 @@ class CommentService {
       throw Exception('Gagal mengirim komentar: $e');
     }
   }
+
+  Future<void> deleteComment(int reviewId,int commentId) async {
+    try {
+      await _dio.delete('/reviews/$reviewId/comments/$commentId');
+    } catch (e) {
+      throw Exception('Gagal menghapus komentar: $e');
+    }
+  }
+
+  Future<void> likeComment(int reviewId, int commentId) async {
+    try {
+      final response = await _dio.post(
+        '/reviews/$reviewId/comments/$commentId/like',
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Gagal like komentar');
+      }
+    } catch (e) {
+      throw Exception('Gagal like komentar: $e');
+    }
+  }
+
+
 }

@@ -5,6 +5,7 @@ import 'package:flutter_novel_app/data/provider/author_provider.dart';
 import 'package:flutter_novel_app/data/provider/category_provider.dart';
 import 'package:flutter_novel_app/data/provider/chapter_provider.dart';
 import 'package:flutter_novel_app/data/provider/comment_provider.dart';
+import 'package:flutter_novel_app/data/provider/novel_featured_provider.dart';
 import 'package:flutter_novel_app/data/provider/novel_provider.dart';
 import 'package:flutter_novel_app/data/provider/reading_provider.dart';
 import 'package:flutter_novel_app/data/provider/review_provider.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_novel_app/data/provider/user_provider.dart';
 import 'package:flutter_novel_app/screens/auth/login_screen.dart';
 import 'package:flutter_novel_app/screens/auth/register_screen.dart';
 import 'package:flutter_novel_app/screens/auth/verify_screen.dart';
+import 'package:flutter_novel_app/screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/explore_screen.dart' as explore;
 import 'screens/saved_screen.dart';
@@ -61,6 +63,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CommentProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
         ChangeNotifierProvider(create: (_) => ReadingHistoryProvider()),
+        ChangeNotifierProvider(create: (_) => NovelFeaturedProvider()),
       ],
       child: MaterialApp(
         useInheritedMediaQuery: true,
@@ -73,6 +76,9 @@ class MyApp extends StatelessWidget {
           '/register': (context) =>   SignUpScreen(),
           '/verify': (context) =>   OtpVerificationScreen(),
           '/main': (context) =>   MainScreen(),
+          '/profile': (context) =>   ProfileScreen(),
+          '/explore': (context) =>   explore.ExploreScreen(),
+          '/saved': (context) =>   SavedScreen(),
         },
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -157,11 +163,12 @@ class MyApp extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
-        home: const MainScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
 }
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -170,8 +177,10 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   static final List<Widget> _screens = [
     const HomeScreen(),
@@ -180,41 +189,111 @@ class _MainScreenState extends State<MainScreen> {
     const ProfileScreen(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      _animationController.reset();
+      _animationController.forward();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFFF5F4ED),
-        selectedItemColor: const Color(0xFF005753),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.95, end: 1.0).animate(_animation),
+          child: Container(
+            height: 70,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F4ED),
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(0, Icons.home, 'Home'),
+                  _buildNavItem(1, Icons.search, 'Explore'),
+                  _buildNavItem(2, Icons.bookmark, 'Simpan'),
+                  _buildNavItem(3, Icons.person, 'Profile'),
+                ],
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Simpan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width / 5,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: isSelected ? 40 : 30,
+              width: isSelected ? 40 : 30,
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF005753).withOpacity(0.15) : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? const Color(0xFF005753) : Colors.grey,
+                size: isSelected ? 24 : 22,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF005753) : Colors.grey,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

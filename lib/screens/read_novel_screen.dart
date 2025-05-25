@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_novel_app/components/shimmer_read_novel.dart';
 import 'package:flutter_novel_app/data/provider/chapter_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
   late ScrollController _scrollController;
   bool _showAppBar = true;
 
-  // Text settings
+
   double _fontSize = 16.0;
   String _currentTheme = 'light';
   Color _backgroundColor = Colors.white;
@@ -38,18 +39,42 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
 
-    // Load saved text settings
+
     _loadTextSettings();
 
-    // Fetch chapters
- WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final chapterProvider =
           Provider.of<ChapterProvider>(context, listen: false);
       if (!chapterProvider.isFetched) {
-        chapterProvider.fetchChapters(widget.novelId);
+        chapterProvider.fetchChapters(widget.novelId).then((_) {
+
+          _updateReadingHistory();
+        });
+      } else {
+
+        _updateReadingHistory();
       }
     });
+  }
 
+  //* ini logic paling the best
+  void _updateReadingHistory() {
+    final chapterProvider = Provider.of<ChapterProvider>(context, listen: false);
+    if (chapterProvider.chapters.isNotEmpty) {
+      final currentChapterNumber = _currentChapterIndex + 1;
+       final progressPercentage = chapterProvider.totalChapter > 0
+          ? (currentChapterNumber / chapterProvider.totalChapter) * 100.0
+          : 0.0;
+
+      final providerReading = Provider.of<ChapterProvider>(context, listen: false);
+      providerReading.postReadingHistory(
+        id: widget.novelId,
+        chapterNumber: currentChapterNumber,
+        lastPageRead: currentChapterNumber,
+        progressPercentage: progressPercentage,
+      );
+    }
   }
 
   Future<void> _loadTextSettings() async {
@@ -61,7 +86,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
         _fontFamily = prefs.getString('fontFamily') ?? 'Roboto';
         _lineHeight = prefs.getDouble('lineHeight') ?? 1.6;
 
-        // Set colors based on theme
+
         _updateThemeColors(_currentTheme);
       });
     } catch (e) {
@@ -107,7 +132,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
   }
 
   void _scrollListener() {
-    // Hide/show app bar based on scroll direction
+
     if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
       if (_showAppBar) {
         setState(() {
@@ -130,6 +155,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
         _currentChapterIndex++;
         _scrollController.jumpTo(0);
       });
+      _updateReadingHistory();
     }
   }
 
@@ -139,6 +165,8 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
         _currentChapterIndex--;
         _scrollController.jumpTo(0);
       });
+
+      _updateReadingHistory();
     }
   }
 
@@ -180,10 +208,10 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
         : null;
     final totalChapter = chapterProvider.totalChapter;
 
-    if (chapterProvider.isLoading) {
+  if (chapterProvider.isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Loading...')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const NovelContentShimmer(),
       );
     }
 
@@ -209,15 +237,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                   onPressed: _showTextSettingsDialog,
                   tooltip: 'Pengaturan Teks',
                 ),
-                IconButton(
-                  icon: const Icon(Icons.bookmark_border),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Bookmark ditambahkan')),
-                    );
-                  },
-                  tooltip: 'Tambah Bookmark',
-                ),
+
                 IconButton(
                   icon: const Icon(Icons.menu),
                   onPressed: _showChapterList,
@@ -228,7 +248,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
           : null,
       body: Column(
         children: [
-          // Chapter progress indicator
+
           LinearProgressIndicator(
             value: (_currentChapterIndex + 1) / totalChapter,
             backgroundColor: Colors.grey[300],
@@ -237,7 +257,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
             minHeight: 2,
           ),
 
-          // Chapter content
+
           Expanded(
             child: GestureDetector(
               onTap: () {
@@ -251,7 +271,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Chapter title
+
                     Text(
                       chapter.title,
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -261,7 +281,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Chapter content
+
                     Text(
                       chapter.content,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -274,11 +294,11 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Chapter navigation
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Previous chapter button
+
                         ElevatedButton.icon(
                           onPressed: _currentChapterIndex > 0 ? _previousChapter : null,
                           icon: const Icon(Icons.arrow_back),
@@ -291,7 +311,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                           ),
                         ),
 
-                        // Next chapter button
+
                         ElevatedButton.icon(
                           onPressed: _currentChapterIndex < totalChapter - 1 ? _nextChapter : null,
                           icon: const Icon(Icons.arrow_forward),
@@ -320,7 +340,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Chapter indicator
+
                     Text(
                       'Bab ${_currentChapterIndex + 1}/$totalChapter',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -328,7 +348,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                           ),
                     ),
 
-                    // Chapter dropdown
+
                     DropdownButton<int>(
                       value: _currentChapterIndex,
                       onChanged: (value) {
@@ -337,6 +357,8 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                             _currentChapterIndex = value;
                             _scrollController.jumpTo(0);
                           });
+
+                          _updateReadingHistory();
                         }
                       },
                       items: List.generate(
@@ -379,7 +401,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Font size slider
+
                   Text(
                     'Ukuran Teks',
                     style: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
@@ -409,7 +431,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
 
                   const SizedBox(height: 12),
 
-                  // Line height
+
                   Text(
                     'Jarak Baris',
                     style: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
@@ -439,7 +461,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Font family selection
+
                   Text(
                     'Jenis Font',
                     style: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
@@ -457,7 +479,7 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Theme selection
+
                   Text(
                     'Tema',
                     style: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
@@ -617,18 +639,25 @@ class _ReadNovelScreenState extends State<ReadNovelScreen> {
                             color: _textColor.withOpacity(0.7),
                           ),
                         ),
-                        leading: isCurrentChapter
+                        leading:  isCurrentChapter
                             ? Icon(
-                                Icons.bookmark,
+                                Icons.menu_book_rounded,
                                 color: Theme.of(context).primaryColor,
                               )
-                            : const Icon(Icons.bookmark_border),
+                            : Icon(
+                                Icons
+                                    .menu_book_outlined,
+                                color: Colors.grey,
+                              ),
+
                         onTap: () {
                           setState(() {
                             _currentChapterIndex = index;
                             _scrollController.jumpTo(0);
                           });
                           Navigator.pop(context);
+
+                          _updateReadingHistory();
                         },
                       );
                     },

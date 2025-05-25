@@ -42,7 +42,7 @@ class CommentModel {
   final int userId;
   final int reviewId;
   final String content;
-  final int likesCount;
+  late final int likesCount;
   final DateTime createdAt;
   final DateTime updatedAt;
   final User user;

@@ -173,7 +173,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                         ),
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            hintText: 'Name',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFF006B5E)),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                            ),
+                          ),
+                          validator: _validateName,
+                        ),
                         const SizedBox(height: 20),
+                       TextFormField(
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
+                            hintText: 'Username',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFF006B5E)),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                            ),
+                          ),
+                          validator: _validateUsername,
+                        ),
+                        const SizedBox(height: 15),
                         // Email field
                         TextFormField(
                           controller: _emailController,
@@ -215,42 +250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         const SizedBox(height: 15),
                         // Username field
-                        TextFormField(
-                          controller: _usernameController,
-                          decoration: const InputDecoration(
-                            hintText: 'Username',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF006B5E)),
-                            ),
-                            errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                            ),
-                          ),
-                          validator: _validateUsername,
-                        ),
-                        const SizedBox(height: 15),
                         // Name field
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(
-                            hintText: 'Name',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF006B5E)),
-                            ),
-                            errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                            ),
-                          ),
-                          validator: _validateName,
-                        ),
                         const SizedBox(height: 15),
 
                         // Terms and conditions checkbox
@@ -267,7 +267,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             Expanded(
                               child: GestureDetector(
-                                onTap: () {
+                                onTap: ( ) {
                                   setState(() {
                                     _agreeToTerms = !_agreeToTerms;
                                   });

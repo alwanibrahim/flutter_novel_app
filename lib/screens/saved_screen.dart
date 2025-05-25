@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_novel_app/data/model/novel_model.dart';
 import 'package:flutter_novel_app/data/model/reading_model.dart';
 import 'package:flutter_novel_app/data/provider/reading_provider.dart';
-import 'package:flutter_novel_app/models/reading_history_model.dart';
 import 'package:flutter_novel_app/screens/detail_novel_screen.dart';
 import 'package:flutter_novel_app/screens/explore_screen.dart';
 import 'package:intl/intl.dart';

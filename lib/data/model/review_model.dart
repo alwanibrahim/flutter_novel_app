@@ -175,74 +175,78 @@ class Novel {
 }
 
 class ReviewModel {
-    final int id;
-    final int userId;
-    final int novelId;
-    final int rating;
-    final String comment;
-    final int likesCount;
-    final bool isSpoiler;
-    final DateTime createdAt;
-    final DateTime updatedAt;
-    final Novel? novel;
-    final User user;
+  final int? id;
+  final int? userId;
+  final int? novelId;
+  final int? rating;
+  final String? comment;
+  final int? likesCount;
+  final bool? isSpoiler;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final Novel? novel;
+  final User? user;
 
-    ReviewModel({
-        required this.id,
-        required this.userId,
-        required this.novelId,
-        required this.rating,
-        required this.comment,
-        required this.likesCount,
-        required this.isSpoiler,
-        required this.createdAt,
-        required this.updatedAt,
-        this.novel,
-        required this.user,
-    });
+  ReviewModel({
+    this.id,
+    this.userId,
+    this.novelId,
+    this.rating,
+    this.comment,
+    this.likesCount,
+    this.isSpoiler,
+    this.createdAt,
+    this.updatedAt,
+    this.novel,
+    this.user,
+  });
 
-    ReviewModel copyWith({
-        int? id,
-        int? userId,
-        int? novelId,
-        int? rating,
-        String? comment,
-        int? likesCount,
-        bool? isSpoiler,
-        DateTime? createdAt,
-        DateTime? updatedAt,
-        Novel? novel,
-        User? user,
-    }) =>
-        ReviewModel(
-            id: id ?? this.id,
-            userId: userId ?? this.userId,
-            novelId: novelId ?? this.novelId,
-            rating: rating ?? this.rating,
-            comment: comment ?? this.comment,
-            likesCount: likesCount ?? this.likesCount,
-            isSpoiler: isSpoiler ?? this.isSpoiler,
-            createdAt: createdAt ?? this.createdAt,
-            updatedAt: updatedAt ?? this.updatedAt,
-            novel: novel ?? this.novel,
-            user: user ?? this.user,
-        );
+  ReviewModel copyWith({
+    int? id,
+    int? userId,
+    int? novelId,
+    int? rating,
+    String? comment,
+    int? likesCount,
+    bool? isSpoiler,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Novel? novel,
+    User? user,
+  }) =>
+      ReviewModel(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        novelId: novelId ?? this.novelId,
+        rating: rating ?? this.rating,
+        comment: comment ?? this.comment,
+        likesCount: likesCount ?? this.likesCount,
+        isSpoiler: isSpoiler ?? this.isSpoiler,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        novel: novel ?? this.novel,
+        user: user ?? this.user,
+      );
 
-    factory ReviewModel.fromJson(Map<String, dynamic> json) => ReviewModel(
-        id: json["id"],
-        userId: json["user_id"],
-        novelId: json["novel_id"],
-        rating: json["rating"],
-        comment: json["comment"],
-        likesCount: json["likes_count"],
-        isSpoiler: json["is_spoiler"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        novel: json["novel"] == null ? null : Novel.fromJson(json["novel"]),
-        user: User.fromJson(json["user"]),
-    );
+  factory ReviewModel.fromJson(Map<String, dynamic> json) => ReviewModel(
+        id: json["id"] as int?,
+        userId: json["user_id"] as int?,
+        novelId: json["novel_id"] as int?,
+        rating: json["rating"] as int?,
+        comment: json["comment"] as String? ?? '-',
+        likesCount: int.tryParse(json["likes_count"]?.toString() ?? '0'),
+        isSpoiler: json["is_spoiler"] as bool?,
+        createdAt: json["created_at"] != null
+            ? DateTime.tryParse(json["created_at"])
+            : null,
+        updatedAt: json["updated_at"] != null
+            ? DateTime.tryParse(json["updated_at"])
+            : null,
+        novel: json["novel"] != null ? Novel.fromJson(json["novel"]) : null,
+        user: json["user"] != null ? User.fromJson(json["user"]) : null,
+      );
 
-    Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() => {
         "id": id,
         "user_id": userId,
         "novel_id": novelId,
@@ -250,12 +254,13 @@ class ReviewModel {
         "comment": comment,
         "likes_count": likesCount,
         "is_spoiler": isSpoiler,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
         "novel": novel?.toMap(),
-        "user": user.toMap(),
-    };
+        "user": user?.toMap(),
+      };
 }
+
 
 class Author {
     final int id;

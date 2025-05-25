@@ -499,7 +499,7 @@ class Review {
         id: json["id"],
         userId: json["user_id"],
         novelId: json["novel_id"],
-        rating: json["rating"],
+        rating: json["rating"] ?? 0 .toString(),
         comment: json["comment"],
         likesCount: json["likes_count"],
         isSpoiler: json["is_spoiler"],
@@ -530,7 +530,7 @@ class User {
   final dynamic lastLoginAt;
   final String name;
   final dynamic bio;
-  final dynamic profilePicture;
+  final String? profilePicture;
   final dynamic phoneNumber;
   final String role;
   final bool isActive;
@@ -595,9 +595,9 @@ class User {
         emailVerifiedAt: DateTime.parse(json["email_verified_at"]),
         lastLoginAt: json["last_login_at"],
         name: json["name"],
-        bio: json["bio"],
+        bio: json["bio"]??'-',
         profilePicture: json["profile_picture"],
-        phoneNumber: json["phone_number"],
+        phoneNumber: json["phone_number"]??'+62',
         role: json["role"],
         isActive: json["is_active"],
         createdAt: DateTime.parse(json["created_at"]),

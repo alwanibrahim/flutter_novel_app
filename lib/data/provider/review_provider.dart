@@ -20,6 +20,9 @@ class ReviewProvider with ChangeNotifier {
   String? _error;
   String? get error => _error;
 
+  int get totalMyReviews => _reviewsUlasan.length;
+
+
   Future<void> fetchReviews(int novelId) async {
     _isLoading = true;
     notifyListeners();

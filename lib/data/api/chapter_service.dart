@@ -22,4 +22,54 @@ Future<List<Chapter>> getChaptersByNovelId(int novelId) async {
     }
   }
 
+  Future<Response> getReadingHistoryByNovelId(int novelId) async {
+    try {
+      final response = await _dio.get('/reading-history/$novelId');
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<Response> postReadingHistory({
+    required int id,
+    required int chapterNumber,
+    required int lastPageRead,
+    required double progressPercentage,
+  }) async {
+    final data = {
+      "chapter_number": chapterNumber,
+      "last_page_read": lastPageRead,
+      "progress_percentage": progressPercentage,
+    };
+
+    try {
+      final response = await _dio.post('/reading-history/$id', data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Response> editReadingHistory({
+    required int id,
+    required int chapterNumber,
+    required int lastPageRead,
+    required double progressPercentage,
+  }) async {
+    final data = {
+      "chapter_number": chapterNumber,
+      "last_page_read": lastPageRead,
+      "progress_percentage": progressPercentage,
+    };
+
+    try {
+      final response = await _dio.put('/reading-history/$id', data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }
